@@ -23,6 +23,10 @@ const client = new pg.Client({
 
 await client.connect();
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.post("/query", async (req, res) => {
   const { sql, params, method } = req.body;
 
