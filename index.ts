@@ -1,8 +1,8 @@
 import express from "express";
 import RateLimit from "express-rate-limit";
-import pg from "pg";
 
 import dotenv from "dotenv";
+import { client } from "./db/index.js";
 dotenv.config();
 
 const app = express();
@@ -15,12 +15,6 @@ const limiter = RateLimit({
 app.use(express.json());
 app.use(limiter);
 const port = 3000;
-
-console.log(process.env["DATABASE_URL"]);
-
-const client = new pg.Pool({
-  connectionString: process.env["DATABASE_URL"],
-});
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -49,7 +43,6 @@ app.post("/query", async (req, res) => {
         values: params,
         rowMode: "array",
       });
-      console.log({ result }, "all");
       return res.send(result.rows);
     } catch (e) {
       return res.status(500).json({ error: e });
