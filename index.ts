@@ -21,9 +21,15 @@ app.get("/", (req, res) => {
 });
 
 app.post("/query", async (req, res) => {
+  if (!req.body) {
+    console.log("error: missing body");
+    return res.status(400).json({ error: "missing body" });
+  }
+
   const { sql, params, method } = req.body;
 
   if (!sql || !method || !params) {
+    console.log("error: missing sql, method, or params");
     return res.status(400).json({ error: "missing sql, method, or params" });
   }
 
@@ -36,8 +42,6 @@ app.post("/query", async (req, res) => {
 
   if (method === "all") {
     try {
-      console.log({ sqlBody, params });
-      console.log({ client });
       const result = await client.query({
         text: sqlBody,
         values: params,
@@ -45,6 +49,7 @@ app.post("/query", async (req, res) => {
       });
       return res.send(result.rows);
     } catch (e) {
+      console.log("error from all query", e);
       return res.status(500).json({ error: e });
     }
   } else if (method === "execute") {
@@ -58,6 +63,7 @@ app.post("/query", async (req, res) => {
 
       return res.send(result.rows);
     } catch (e) {
+      console.log("error from execute query", e);
       return res.status(500).json({ error: e });
     }
   } else {
@@ -65,21 +71,21 @@ app.post("/query", async (req, res) => {
   }
 });
 
-app.post("/migrate", async (req, res) => {
-  const { queries } = req.body;
+// app.post("/migrate", async (req, res) => {
+//   const { queries } = req.body;
 
-  await client.query("BEGIN");
-  try {
-    for (const query of queries) {
-      await client.query(query);
-    }
-    await client.query("COMMIT");
-  } catch {
-    await client.query("ROLLBACK");
-  }
+//   await client.query("BEGIN");
+//   try {
+//     for (const query of queries) {
+//       await client.query(query);
+//     }
+//     await client.query("COMMIT");
+//   } catch {
+//     await client.query("ROLLBACK");
+//   }
 
-  return res.send({});
-});
+//   return res.send({});
+// });
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
