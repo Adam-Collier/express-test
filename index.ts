@@ -1,5 +1,6 @@
 import express from "express";
 import RateLimit from "express-rate-limit";
+import morgan from "morgan";
 
 import dotenv from "dotenv";
 import { client } from "./db/index.js";
@@ -14,6 +15,7 @@ const limiter = RateLimit({
 
 app.use(express.json());
 app.use(limiter);
+app.use(morgan("tiny"));
 const port = 3000;
 
 app.get("/", (req, res) => {
