@@ -29,10 +29,16 @@ app.get("/", (req, res) => {
 app.post("/query", async (req, res) => {
   const { sql, params, method } = req.body;
 
-  console.log({ sql, params, method });
+  if (!sql || !method || !params) {
+    return res.status(400).json({ error: "missing sql, method, or params" });
+  }
 
   // prevent multiple queries
-  const sqlBody = sql.replace(/;/g, "");
+  const sqlBody = sql?.replace(/;/g, "");
+
+  if (!sqlBody) {
+    return res.status(400).json({ error: "no sqlBody found" });
+  }
 
   if (method === "all") {
     try {
