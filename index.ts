@@ -43,6 +43,7 @@ app.post("/query", async (req, res) => {
   }
 
   if (method === "all") {
+    await client.connect();
     try {
       const result = await client.query({
         text: sqlBody,
@@ -53,9 +54,12 @@ app.post("/query", async (req, res) => {
     } catch (e) {
       console.log("error from all query", e);
       return res.status(500).json({ error: e });
+    } finally {
+      await client.end();
     }
   } else if (method === "execute") {
     try {
+      await client.connect();
       const result = await client.query({
         text: sqlBody,
         values: params,
@@ -67,6 +71,8 @@ app.post("/query", async (req, res) => {
     } catch (e) {
       console.log("error from execute query", e);
       return res.status(500).json({ error: e });
+    } finally {
+      await client.end();
     }
   } else {
     return res.status(500).json({ error: "Unknown method value" });
